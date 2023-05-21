@@ -1,0 +1,23 @@
+npm init
+
+npm install --save express body-parser
+
+npm install --save-dev nodemon
+
+npm install uuidv4
+
+npm install --save express-validator
+
+npm install --save mongodb
+npm install --save mongoose
+npm install --save mongoose-unique-validator
+
+npm intall --save multer
+npm install --save bcryptjs
+npm install --save jsonwebtoken
+
+POSTMAN allows to test and send API
+crtl + C to stop the job on terminal
+
+user: ritika
+password: NdTKhlGTILQrTkSR
