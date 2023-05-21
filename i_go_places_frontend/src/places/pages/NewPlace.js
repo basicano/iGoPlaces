@@ -56,7 +56,7 @@ const NewPlace = () => {
           console.log(key[0] + ', ' + key[1]);
       }
 
-      await sendRequest('http://localhost:5000/api/places', 'POST', formData, {
+      await sendRequest(process.env.REACT_APP_BACKEND_URL + '/places', 'POST', formData, {
         Authorization: 'Bearer ' + auth.token
       });      
       history.push('/');

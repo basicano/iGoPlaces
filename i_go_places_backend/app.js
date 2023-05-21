@@ -4,12 +4,20 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require("cors");
 
 const placesRoutes = require('./routes/places-routes');
 const usersRoutes = require('./routes/users-routes');
 const HttpError = require('./models/http-error');
 
 const app = express();
+const corsOptions ={
+   origin:'*', 
+   credentials:true,            //access-control-allow-credentials:true
+   optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 
@@ -48,7 +56,7 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-.connect('mongodb+srv://ritika:NdTKhlGTILQrTkSR@cluster0.ihjeh1s.mongodb.net/i_go_places?retryWrites=true&w=majority')
+.connect(`mongodb+srv://ritika:NdTKhlGTILQrTkSR@cluster0.ihjeh1s.mongodb.net/i_go_places?retryWrites=true&w=majority`)
 .then( ()=>{
   app.listen(5000);
 })

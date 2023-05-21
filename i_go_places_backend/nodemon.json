@@ -1,0 +1,9 @@
+{
+    "env": {
+        "DB_USER" : "ritika",
+        "DB_PASSWORD": "NdTKhlGTILQrTkSR",
+        "DB_NAME": "i_go_places",
+        "GOOGLE_API_KEY": "...",
+        "JWT_KEY":"supersecret_donot_share"
+    }
+}
