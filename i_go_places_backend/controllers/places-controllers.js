@@ -39,7 +39,7 @@ const getPlaceById = async (req, res, next) => {
 const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
-  // console.log(userId);
+  console.log(userId);
   let places;
   try {
     places = await Place.find({ creator: userId });
