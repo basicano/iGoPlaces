@@ -1,7 +1,8 @@
-// const uuid = require('uuid/v4');
+// express-validator for input validation, mongoose for interacting with the MongoDB database
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
 
+//  handles retrieving a specific place based on its ID
 const HttpError = require('../models/http-error');
 // const getCoordsForAddress = require('../util/location');
 
@@ -9,10 +10,12 @@ const Place = require('../models/place');
 const User = require('../models/user');
 
 const getPlaceById = async (req, res, next) => {
+  // extracts the place ID from the request parameters
   const placeId = req.params.pid; // { pid: 'p1' }
 
   let place;
   try {
+    // tries to find the place in the database using Place.findById
     place = await Place.findById(placeId);
   } catch (err) {
     const error = new HttpError(
@@ -24,24 +27,29 @@ const getPlaceById = async (req, res, next) => {
 
   if (!place) {
     const error = new HttpError(
+      // not found, it creates a custom error object
       'Could not find a place for the provided id.',
       404
     );
     return next(error);
   }
 
+  // when sucessful, returns the place as a JSON response.
   res.json({ place: place.toObject({ getters: true }) }); // => { place } => { place: place }
 };
 
 // function getPlaceById() { ... }
 // const getPlaceById = function() { ... }
 
+// getPlacesByUserId function retrieves all places associated with a specific user ID
 const getPlacesByUserId = async (req, res, next) => {
+  // extracts the user ID from the request parameters
   const userId = req.params.uid;
 
   console.log(userId);
   let places;
   try {
+    // find the places in the database using Place.find
     places = await Place.find({ creator: userId });
   } catch (err) {
     const error = new HttpError(
@@ -57,10 +65,13 @@ const getPlacesByUserId = async (req, res, next) => {
     );
   }
 
+  // returns the places as a JSON response
   res.json({ places: places.map(place => place.toObject({ getters: true })) });
 };
 
+//  handles the creation of a new place.
 const createPlace = async (req, res, next) => {
+  // checks for validation errors using validationResult
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
@@ -68,6 +79,7 @@ const createPlace = async (req, res, next) => {
     );
   }
 
+  // extracts the necessary data from the request body. It . 
   const { title, description, address, creator } = req.body;
 
   coordinates = [123,123];
@@ -79,6 +91,7 @@ const createPlace = async (req, res, next) => {
   // }
 
   // const title = req.body.title;
+  // creates a new Place object with the provided data
   const createdPlace = new Place({
     title,
     description,
@@ -104,13 +117,23 @@ const createPlace = async (req, res, next) => {
 
   console.log(user);
 
+  // also associates the place with the corresponding user by adding the place to the user.places array
   try {
+    // session in MongoDB allows us to perform multiple database operations within a single transaction-like context, ensuring atomicity and data consistency. 
+    // We then start a transaction by calling the startTransaction() method on the session object.
     const sess = await mongoose.startSession();
     sess.startTransaction();
+
+    //  save the newly created place object (createdPlace) to the database
+    // we pass the session option with the sess object to ensure that the save operation is performed within the current session.
     await createdPlace.save({ session: sess });
+
+    // update the user object by pushing the createdPlace object into the places array. 
+    // This associates the newly created place with the user. 
+    // We then save the updated user object to the database, again passing the session option with the sess object.
     user.places.push(createdPlace);
     await user.save({ session: sess });
-    await sess.commitTransaction();
+    await sess.commitTransaction();    // commits all the changes made within the session to the database atomically
   } catch (err) {
     const error = new HttpError(
       'Creating place failed, please try again.',
@@ -122,7 +145,9 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
+// handles updating an existing place
 const updatePlace = async (req, res, next) => {
+  // checks for validation errors using validationResult
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return next(
@@ -149,9 +174,11 @@ const updatePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // if user is the owner, update 
   place.title = title;
   place.description = description;
 
+  // save the changes
   try {
     await place.save();
   } catch (err) {
@@ -162,9 +189,11 @@ const updatePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // returns the updated place in the response
   res.status(200).json({ place: place.toObject({ getters: true }) });
 };
 
+// handles the deletion of a place
 const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
 
@@ -184,6 +213,7 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // checks if the logged-in user is the creator of the place
   if (place.creator.id !== req.userData.userId) {
     const error = new HttpError(
       'You are not allowed to delete this place.',
