@@ -8,6 +8,7 @@ import Backdrop from '../UIElements/Backdrop';
 import './MainNavigation.css';
 
 const MainNavigation = props => {
+  // useState hook to manage the state of drawerIsOpen, which determines whether the side drawer is open or closed.
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
 
   const openDrawerHandler = () => {
@@ -22,7 +23,7 @@ const MainNavigation = props => {
     // Fragment is a wrapper
     <React.Fragment>
       {drawerIsOpen && <Backdrop onClick={closeDrawerHandler} />}
-      <SideDrawer show={drawerIsOpen} onClick={closeDrawerHandler}>
+      <SideDrawer show={drawerIsOpen} onClick={closeDrawerHandler}> //show prop determines whether the side drawer is shown or hidden
         <nav className="main-navigation__drawer-nav">
           <NavLinks />
         </nav>
