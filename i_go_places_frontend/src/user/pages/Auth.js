@@ -17,10 +17,14 @@ import { AuthContext } from '../../shared/context/auth-context';
 import './Auth.css';
 
 const Auth = () => {
+  // uses the useContext hook to access the authentication context from AuthContext
   const auth = useContext(AuthContext);
+  // initializes necessary states using the useState hook, such as isLoginMode to manage the login/signup mode
   const [isLoginMode, setIsLoginMode] = useState(true);
+  // useHttpClient hook is used to handle HTTP requests
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
+  // useForm hook is used to manage the form state and input handling
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -35,6 +39,8 @@ const Auth = () => {
     false
   );
 
+  // switchModeHandler, is called when the "Switch to Signup/Login" button is clicked.
+  // It switches the mode between login and signup by toggling the isLoginMode state.
   const switchModeHandler = () => {
     if (!isLoginMode) {
       setFormData(
@@ -64,14 +70,16 @@ const Auth = () => {
     setIsLoginMode(prevMode => !prevMode);
   };
 
+  // called when the authentication form is submitted
   const authSubmitHandler = async event => {
-    event.preventDefault();
+    event.preventDefault();  //prevents the default form submission behavior
 
     if (isLoginMode) {
       try {
+        // sends a login request to the backend server using the sendRequest 
         const responseData = await sendRequest(
           process.env.REACT_APP_BACKEND_URL +'/users/login',
-          'POST',
+          'POST',      // sends a POST request to the /users/login endpoint with the user's email and password
           JSON.stringify({
             email: formState.inputs.email.value,
             password: formState.inputs.password.value
@@ -80,11 +88,12 @@ const Auth = () => {
             'Content-Type': 'application/json'
           }
         );
-        auth.login(responseData.userId, responseData.token);
+        auth.login(responseData.userId, responseData.token);    // to set the user's authentication status
 
       } catch (err) {}
     } else {
       try {
+        // creates a formData object and appends the user's email, name, password, and image data
         const formData = new FormData();
         formData.append('email', formState.inputs.email.value);
         formData.append('name', formState.inputs.name.value);
@@ -97,16 +106,19 @@ const Auth = () => {
         // }
         const responseData = await sendRequest(
           process.env.REACT_APP_BACKEND_URL +'/users/signup',
-          'POST',
+          'POST',        // POST request to the /users/signup endpoint with the form data
           formData
         );
 
-        auth.login(responseData.userId, responseData.token);
+        auth.login(responseData.userId, responseData.token);   //function is called to set the user's authentication status.
 
       } catch (err) {}
     }
   };
 
+  // renders the JSX code for the authentication form
+  // omponent to display any errors, a Card component as a container for the form, 
+  // and a LoadingSpinner component to show a loading spinner while the form is being processed.
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
@@ -139,10 +151,12 @@ const Auth = () => {
             id="email"
             type="email"
             label="E-Mail"
-            validators={[VALIDATOR_EMAIL()]}
+            validators={[VALIDATOR_EMAIL()]}     
             errorText="Please enter a valid email address."
             onInput={inputHandler}
           />
+              //  validators={[VALIDATOR_EMAIL()]}    array of validator functions to validate the input   
+            // onInput={inputHandler}    a function that is called whenever the input field value changes. It is responsible for handling the input and updating the form state.
           <Input
             element="input"
             id="password"
@@ -159,6 +173,13 @@ const Auth = () => {
         <Button inverse onClick={switchModeHandler}>
           SWITCH TO {isLoginMode ? 'SIGNUP' : 'LOGIN'}
         </Button>
+           // inverse: It is a boolean prop that determines the styling of the button. 
+          // When set to true, it applies the "inverse" style, which typically means a button with a light background and dark text.
+          // onClick: It is a function that is called when the button is clicked. In this case, it calls the switchModeHandler function when the button is clicked.
+          // Children (text): The text content between the opening and closing tags of the <Button> component is the content of the button. 
+          // It displays the text "SWITCH TO" followed by either "SIGNUP" or "LOGIN" based on the isLoginMode state. 
+          // If isLoginMode is true, it displays "LOGIN", otherwise it displays "SIGNUP".
+          
       </Card>
     </React.Fragment>
   );
