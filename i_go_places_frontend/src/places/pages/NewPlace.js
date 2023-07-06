@@ -16,8 +16,12 @@ import { AuthContext } from '../../shared/context/auth-context';
 import './PlaceForm.css';
 
 const NewPlace = () => {
+  // the useContext hook is used to access the AuthContext and get the authentication data from it (auth)
   const auth = useContext(AuthContext);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+  // useForm hook is used to manage the form state. It takes an initial state object and a boolean indicating the overall validity of the form. 
+  // It returns a state variable formState and an inputHandler function to handle form input changes.
   const [formState, inputHandler] = useForm(
     {
       title: {
@@ -40,8 +44,12 @@ const NewPlace = () => {
     false
   );
 
+  // useHistory hook is used to access the history object, which allows for programmatic navigation.
   const history = useHistory();
 
+  // placeSubmitHandler function is responsible for handling the form submission. 
+  // It creates a FormData object and appends the input values from the formState to it. 
+  // It then sends a POST request to the backend API (/places) with the form data and the authentication token in the request headers.
   const placeSubmitHandler = async event => {
     event.preventDefault();
     try {
