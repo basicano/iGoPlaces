@@ -11,10 +11,15 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 import './PlaceItem.css';
 
 const PlaceItem = props => {
+  // useHttpClient hook to handle HTTP requests
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+  // authentication context using the useContext hook.
   const auth = useContext(AuthContext);
-  const [showMap, setShowMap] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  
+  // initializes necessary states using the useState hook
+  const [showMap, setShowMap] = useState(false);            // showMap to manage the visibility of the map modal 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);      // showConfirmModal to manage the visibility of the delete confirmation modal
 
   const openMapHandler = () => setShowMap(true);
 
@@ -28,6 +33,8 @@ const PlaceItem = props => {
     setShowConfirmModal(false);
   };
 
+  // confirmDeleteHandler is an async function that handles the deletion of a place. 
+  // It sends a DELETE request to the backend server to delete the place and calls the onDelete prop function passed from the parent component.
   const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
     try {
@@ -49,15 +56,16 @@ const PlaceItem = props => {
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
-        header={props.address}
+        header={props.address}        // header prop is set to the props.address, which displays the address of the place as the modal header. 
         contentClass="place-item__modal-content"
-        footerClass="place-item__modal-actions"
+        footerClass="place-item__modal-actions"          // an onClick handler to close the map modal
         footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
       >
-        <div className="map-container">
-          <Map center={props.coordinates} zoom={16} />
+        <div className="map-container">  
+          <Map center={props.coordinates} zoom={16} />    // Map component renders a map with the coordinates provided through the props.coordinates prop.
         </div>
       </Modal>
+          // enders the Modal component, which is used to show a map for the place item
       <Modal
         show={showConfirmModal}
         onCancel={cancelDeleteHandler}
@@ -81,6 +89,7 @@ const PlaceItem = props => {
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
+            // optional <LoadingSpinner> component that is displayed when isLoading is true
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img src={process.env.REACT_APP_ASSET_URL + `/${props.image}`} alt={props.title} />
