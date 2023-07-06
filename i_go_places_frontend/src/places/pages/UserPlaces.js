@@ -15,6 +15,7 @@ const UserPlaces = () => {
   useEffect(() => {
     const fetchPlaces = async () => {
       try {
+        // sends a GET request to the backend API to retrieve the places belonging to the user with the specified userId. 
         const responseData = await sendRequest(
           process.env.REACT_APP_BACKEND_URL +`/places/user/${userId}`
         );
@@ -24,6 +25,8 @@ const UserPlaces = () => {
     fetchPlaces();
   }, [sendRequest, userId]);
 
+  // placeDeletedHandler function is responsible for handling the deletion of a place. 
+  // It takes the deletedPlaceId as an argument and updates the loadedPlaces state by removing the deleted place from the list.
   const placeDeletedHandler = deletedPlaceId => {
     setLoadedPlaces(prevPlaces =>
       prevPlaces.filter(place => place.id !== deletedPlaceId)
