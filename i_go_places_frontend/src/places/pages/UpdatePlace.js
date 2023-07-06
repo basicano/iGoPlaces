@@ -15,11 +15,12 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/context/auth-context';
 import './PlaceForm.css';
 
+// UpdatePlace component is defined as a functional component
 const UpdatePlace = () => {
   const auth = useContext(AuthContext);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const [loadedPlace, setLoadedPlace] = useState();
-  const placeId = useParams().placeId;
+  const [loadedPlace, setLoadedPlace] = useState();  // loadedPlace is used to store the retrieved place data, and formState is used to manage the form input stat
+  const placeId = useParams().placeId;  // useParams hook is used to extract the placeId from the URL parameters
   const history = useHistory();
 
   const [formState, inputHandler, setFormData] = useForm(
@@ -36,9 +37,11 @@ const UpdatePlace = () => {
     false
   );
 
+  // useEffect hook is used to fetch the place data when the component mounts 
   useEffect(() => {
     const fetchPlace = async () => {
       try {
+        // sends a GET request to the backend API to retrieve the place details using the placeId
         const responseData = await sendRequest(
           process.env.REACT_APP_BACKEND_URL +`/places/${placeId}`
         );
@@ -61,9 +64,12 @@ const UpdatePlace = () => {
     fetchPlace();
   }, [sendRequest, placeId, setFormData]);
 
+  // placeUpdateSubmitHandler function is responsible for handling the form submission
   const placeUpdateSubmitHandler = async event => {
     event.preventDefault();
     try {
+      // PATCH request to the backend API to update the place with the modified values from the form. 
+      // The request includes the updated title and description in the request body and the authentication token in the headers.
       await sendRequest(
         `http://localhost:5000/api/places/${placeId}`,
         'PATCH',
@@ -80,6 +86,11 @@ const UpdatePlace = () => {
     } catch (err) {}
   };
 
+
+  //  rendering of the component. 
+  // If the data is still loading, a LoadingSpinner component is displayed. 
+  // If the place data couldn't be loaded or an error occurred, an error message is displayed.
+  
   if (isLoading) {
     return (
       <div className="center">
